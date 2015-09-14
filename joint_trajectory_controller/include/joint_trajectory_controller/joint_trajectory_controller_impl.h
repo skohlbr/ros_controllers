@@ -200,6 +200,19 @@ checkPathTolerances(const typename Segment::State& state_error,
     rt_segment_goal->setAborted(rt_segment_goal->preallocated_result_);
     rt_active_goal_.reset();
   }
+
+  //ROS_INFO("bla %f", joints_[0].getPosition());
+
+  if (std::fabs(joints_[0].getPosition()) > 0.2){
+    rt_segment_goal->preallocated_result_->error_code =
+        control_msgs::FollowJointTrajectoryResult::PATH_TOLERANCE_VIOLATED;
+    rt_segment_goal->setAborted(rt_segment_goal->preallocated_result_);
+    rt_active_goal_.reset();
+    this->setHoldPosition(ros::Time::now());
+    ROS_INFO("Simulated joint control failure, stopping.");
+  }
+
+
 }
 
 template <class SegmentImpl, class HardwareInterface>
