@@ -31,7 +31,6 @@
 #ifndef JOINT_TRAJECTORY_CONTROLLER_JOINT_TRAJECTORY_CONTROLLER_IMP_H
 #define JOINT_TRAJECTORY_CONTROLLER_JOINT_TRAJECTORY_CONTROLLER_IMP_H
 
-
 namespace joint_trajectory_controller
 {
 
@@ -162,6 +161,14 @@ trajectoryCommandCB(const JointTrajectoryConstPtr& msg)
 {
   const bool update_ok = updateTrajectoryCommand(msg, RealtimeGoalHandlePtr());
   if (update_ok) {preemptActiveGoal();}
+}
+
+template <class SegmentImpl, class HardwareInterface>
+inline void JointTrajectoryController<SegmentImpl, HardwareInterface>::
+failureCommandCB(const std_msgs::EmptyConstPtr& msg)
+{
+
+
 }
 
 template <class SegmentImpl, class HardwareInterface>
@@ -327,6 +334,7 @@ bool JointTrajectoryController<SegmentImpl, HardwareInterface>::init(HardwareInt
 
   // ROS API: Subscribed topics
   trajectory_command_sub_ = controller_nh_.subscribe("command", 1, &JointTrajectoryController::trajectoryCommandCB, this);
+  failure_command_sub_ = controller_nh_.subscribe("inject_failure", 1, &JointTrajectoryController::failureCommandCB, this);
 
   // ROS API: Published topics
   state_publisher_.reset(new StatePublisher(controller_nh_, "state", 1));

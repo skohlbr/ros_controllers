@@ -74,6 +74,8 @@
 #include <joint_trajectory_controller/init_joint_trajectory.h>
 #include <joint_trajectory_controller/hardware_interface_adapter.h>
 
+#include <std_msgs/Empty.h>
+
 namespace joint_trajectory_controller
 {
 
@@ -210,6 +212,7 @@ private:
   // ROS API
   ros::NodeHandle    controller_nh_;
   ros::Subscriber    trajectory_command_sub_;
+  ros::Subscriber    failure_command_sub_;
   ActionServerPtr    action_server_;
   ros::ServiceServer query_state_service_;
   StatePublisherPtr  state_publisher_;
@@ -219,6 +222,7 @@ private:
 
   bool updateTrajectoryCommand(const JointTrajectoryConstPtr& msg, RealtimeGoalHandlePtr gh);
   void trajectoryCommandCB(const JointTrajectoryConstPtr& msg);
+  void failureCommandCB(const std_msgs::EmptyConstPtr& msg);
   void goalCB(GoalHandle gh);
   void cancelCB(GoalHandle gh);
   void preemptActiveGoal();
