@@ -165,10 +165,9 @@ trajectoryCommandCB(const JointTrajectoryConstPtr& msg)
 
 template <class SegmentImpl, class HardwareInterface>
 inline void JointTrajectoryController<SegmentImpl, HardwareInterface>::
-failureCommandCB(const std_msgs::EmptyConstPtr& msg)
+failureCommandCB(const std_msgs::BoolConstPtr& msg)
 {
-
-
+  in_failure_state_ = msg->data;
 }
 
 template <class SegmentImpl, class HardwareInterface>
@@ -203,7 +202,9 @@ checkPathTolerances(const typename Segment::State& state_error,
 
   //ROS_INFO("bla %f", joints_[0].getPosition());
 
-  if (std::fabs(joints_[0].getPosition()) > 0.2){
+  //if (std::fabs(joints_[0].getPosition()) > 0.2){
+
+  if (in_failure_state_){
     rt_segment_goal->preallocated_result_->error_code =
         control_msgs::FollowJointTrajectoryResult::PATH_TOLERANCE_VIOLATED;
     rt_segment_goal->setAborted(rt_segment_goal->preallocated_result_);
@@ -257,7 +258,8 @@ template <class SegmentImpl, class HardwareInterface>
 JointTrajectoryController<SegmentImpl, HardwareInterface>::
 JointTrajectoryController()
   : verbose_(false), // Set to true during debugging
-    hold_trajectory_ptr_(new Trajectory)
+    hold_trajectory_ptr_(new Trajectory),
+    in_failure_state_ (false)
 {}
 
 template <class SegmentImpl, class HardwareInterface>

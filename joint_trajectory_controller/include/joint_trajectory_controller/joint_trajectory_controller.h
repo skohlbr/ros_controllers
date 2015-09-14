@@ -74,7 +74,7 @@
 #include <joint_trajectory_controller/init_joint_trajectory.h>
 #include <joint_trajectory_controller/hardware_interface_adapter.h>
 
-#include <std_msgs/Empty.h>
+#include <std_msgs/Bool.h>
 
 namespace joint_trajectory_controller
 {
@@ -222,12 +222,14 @@ private:
 
   bool updateTrajectoryCommand(const JointTrajectoryConstPtr& msg, RealtimeGoalHandlePtr gh);
   void trajectoryCommandCB(const JointTrajectoryConstPtr& msg);
-  void failureCommandCB(const std_msgs::EmptyConstPtr& msg);
+  void failureCommandCB(const std_msgs::BoolConstPtr& msg);
   void goalCB(GoalHandle gh);
   void cancelCB(GoalHandle gh);
   void preemptActiveGoal();
   bool queryStateService(control_msgs::QueryTrajectoryState::Request&  req,
                          control_msgs::QueryTrajectoryState::Response& resp);
+
+  bool in_failure_state_;
 
   /**
    * \brief Publish current controller state at a throttled frequency.
