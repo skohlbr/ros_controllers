@@ -203,7 +203,7 @@ checkPathTolerances(const typename Segment::State& state_error,
   //ROS_INFO("bla %f", joints_[0].getPosition());
 
   //if (std::fabs(joints_[0].getPosition()) > 0.2){
-
+  /*
   if (in_failure_state_){
     rt_segment_goal->preallocated_result_->error_code =
         control_msgs::FollowJointTrajectoryResult::PATH_TOLERANCE_VIOLATED;
@@ -212,7 +212,7 @@ checkPathTolerances(const typename Segment::State& state_error,
     this->setHoldPosition(ros::Time::now());
     ROS_INFO("Simulated joint control failure, stopping.");
   }
-
+  */
 
 }
 
@@ -516,11 +516,29 @@ updateTrajectoryCommand(const JointTrajectoryConstPtr& msg, RealtimeGoalHandlePt
   options.rt_goal_handle     = gh;
   options.default_tolerances = &default_tolerances_;
 
+
+  boost::shared_ptr<trajectory_msgs::JointTrajectory> trajectory;
+  trajectory.reset(new trajectory_msgs::JointTrajectory());
+
+  *trajectory = *msg;
+
+  if (in_failure_state_ && (joints_.size() == 5)){
+    ROS_INFO("Simulated joint control failure.");
+    for (size_t p = 0; p < trajectory->points.size(); ++p){
+      for (size_t i = 0; i < 4 ; ++i){
+        trajectory->points[p].positions[i] = joints_[i].getPosition();
+        trajectory->points[p].velocities[i] = 0.0;
+        trajectory->points[p].accelerations[i] = 0.0;
+      }
+    }
+  }
+
+
   // Update currently executing trajectory
   try
   {
     TrajectoryPtr traj_ptr(new Trajectory);
-    *traj_ptr = initJointTrajectory<Trajectory>(*msg, next_update_time, options);
+    *traj_ptr = initJointTrajectory<Trajectory>(*trajectory, next_update_time, options);
     if (!traj_ptr->empty())
     {
       curr_trajectory_box_.set(traj_ptr);
